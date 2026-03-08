@@ -310,7 +310,7 @@ function initFormValidation() {
     });
   });
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     let isValid = true;
@@ -321,13 +321,40 @@ function initFormValidation() {
     });
 
     if (isValid) {
-      const name = fields.name.el.value.trim();
-      const email = fields.email.el.value.trim();
-      const subject = fields.subject.el.value.trim();
-      const message = fields.message.el.value.trim();
+      const submitBtn = document.getElementById('btn-submit');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = 'Sending...';
 
-      const mailtoLink = `mailto:hammad5718@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(`From: ${name} (${email})\n\n${message}`)}`;
-      window.location.href = mailtoLink;
+      try {
+        const formData = new FormData(form);
+        const response = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          body: formData
+        });
+        const result = await response.json();
+
+        if (result.success) {
+          form.reset();
+          submitBtn.innerHTML = '✓ Message Sent!';
+          submitBtn.style.background = '#22c55e';
+          setTimeout(() => {
+            submitBtn.innerHTML = originalText;
+            submitBtn.style.background = '';
+            submitBtn.disabled = false;
+          }, 3000);
+        } else {
+          throw new Error(result.message || 'Something went wrong');
+        }
+      } catch (err) {
+        submitBtn.innerHTML = '✗ Failed to send';
+        submitBtn.style.background = '#ef4444';
+        setTimeout(() => {
+          submitBtn.innerHTML = originalText;
+          submitBtn.style.background = '';
+          submitBtn.disabled = false;
+        }, 3000);
+      }
     }
   });
 }
