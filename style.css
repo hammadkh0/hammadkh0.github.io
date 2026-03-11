@@ -1242,7 +1242,7 @@ a.contact-card:hover {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 1004;
+  z-index: 999;
   opacity: 0;
   visibility: hidden;
   transition: all var(--transition-speed) ease;

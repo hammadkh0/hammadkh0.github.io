@@ -21,11 +21,9 @@ function initTheme() {
   const toggle = document.getElementById('theme-toggle');
   const saved = localStorage.getItem('theme');
 
-  if (saved) {
-    document.documentElement.setAttribute('data-theme', saved);
-  } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
-    document.documentElement.setAttribute('data-theme', 'light');
-  }
+  // Default to light mode; only use saved preference if it exists
+  const theme = saved || 'light';
+  document.documentElement.setAttribute('data-theme', theme);
 
   toggle.addEventListener('click', () => {
     const current = document.documentElement.getAttribute('data-theme');
@@ -178,10 +176,12 @@ function initSmoothScroll() {
       const targetEl = document.querySelector(targetId);
       if (targetEl) {
         e.preventDefault();
-        targetEl.scrollIntoView({ behavior: 'smooth' });
-
-        // Close mobile menu if open
+        // Close mobile menu FIRST so body overflow is restored before scrolling
         closeMobileMenu();
+        // Small delay lets the menu slide out and overflow restore before scroll
+        setTimeout(() => {
+          targetEl.scrollIntoView({ behavior: 'smooth' });
+        }, 10);
       }
     });
   });
